@@ -58,13 +58,14 @@ print(image_normalized.max())
 # Clip the values to be between 0 and 1
 image_balanced = image_normalized.clip(0,1)
 
-cv2.rectangle(clone, (w_start, h_start), (w_start+w_width, h_start+h_width), (0,0,255), 2)
-cv2.namedWindow('Image', cv2.WINDOW_NORMAL)
-cv2.imshow("Image", image)
-cv2.namedWindow('Image GT Balanced', cv2.WINDOW_NORMAL)
-cv2.imshow("Image GT Balanced", image_balanced)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# Display the original and balanced images (optional)
+# cv2.rectangle(clone, (w_start, h_start), (w_start+w_width, h_start+h_width), (0,0,255), 2)
+# cv2.namedWindow('Image', cv2.WINDOW_NORMAL)
+# cv2.imshow("Image", image)
+# cv2.namedWindow('Image GT Balanced', cv2.WINDOW_NORMAL)
+# cv2.imshow("Image GT Balanced", image_balanced)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
 
 # Save as 8 bit
 image_balanced_8bit = (image_balanced*255).astype(int)

@@ -72,6 +72,4 @@ for file in os.listdir(input_path):
     
     # Save the balanced image to output
     output_file_path = os.path.join(output_path, f"balanced_{file}")
-    # print(f"Saving balanced image to: {output_file_path}")
     cv2.imwrite(output_file_path, image_gt_balanced_8bit)
-    # print("Image saved successfully.")
