@@ -1,9 +1,11 @@
 import os
 import cv2 
 import numpy as np
+import matplotlib.pyplot as plt
 
-input_path = 'PLACEHOLDER'
-output_path = 'PLACEHOLDER'
+input_path = 'C:/[...]/input/'
+output_path = 'C:/[...]/output/GT/'
+histogram_output_path = 'C:/[...]/output/GT/graph/'
 
 # Ground truth reference
 
@@ -35,10 +37,22 @@ def click_event(event, x, y, flags, params):
         h_width = abs(y - h_start)
         w_width = abs(x - w_start)
 
+def plot_color_histograms(ax, img, title):
+    colors = ('b', 'g', 'r')
+    ax.set_title(f'Histograma - {title}')
+    ax.set_xlabel('Bins')
+    ax.set_ylabel('Píxeis')
+    for i, color in enumerate(colors):
+        hist = cv2.calcHist([img], [i], None, [256], [0, 256])
+        ax.plot(hist, color=color)
+        ax.set_xlim([0, 256])
+
+i = 0
 for file in os.listdir(input_path):
     input_file_path = os.path.join(input_path, file)
     img = cv2.imread(input_file_path, 1)
-    clone = img.copy() # Creating duplicate for annotations.
+    # Creating duplicate for annotations.
+    clone = img.copy()
 
     # Display clickable image.
     cv2.namedWindow('image', cv2.WINDOW_NORMAL)
@@ -58,18 +72,37 @@ for file in os.listdir(input_path):
     # Clip the values to be between 0 and 1
     image_gt_balanced = image_normalized.clip(0,1)
 
-    # Display the original and balanced images (optional)
-    # cv2.rectangle(clone, (w_start, h_start), (w_start+w_width, h_start+h_width), (0,0,255), 2)
-    # cv2.namedWindow('Image', cv2.WINDOW_NORMAL)
-    # cv2.imshow("Image", image)
-    # cv2.namedWindow('Image GT Balanced', cv2.WINDOW_NORMAL)
-    # cv2.imshow("Image GT Balanced", image_gt_balanced)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
-
-    # Save as 8 bit
-    image_gt_balanced_8bit = (image_gt_balanced*255).astype(int)
+    # Save as uint 8 bit
+    image_gt_balanced_8bit = (image_gt_balanced*255).astype(np.uint8)
     
     # Save the balanced image to output
     output_file_path = os.path.join(output_path, f"balanced_{file}")
     cv2.imwrite(output_file_path, image_gt_balanced_8bit)
+    
+    # Create a figure with multiple subplots
+    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+    
+    # Original image
+    axes[0, 0].imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+    axes[0, 0].set_title('Imagem original')
+    axes[0, 0].axis('off')
+    
+    # White-balanced image
+    axes[0, 1].imshow(cv2.cvtColor(image_gt_balanced_8bit, cv2.COLOR_BGR2RGB))
+    axes[0, 1].set_title('Ground truth')
+    axes[0, 1].axis('off')
+    
+    # Plot histograms for the original image
+    plot_color_histograms(axes[1, 0], img, 'Imagem original')
+    
+    # Plot histograms for the white-balanced image
+    plot_color_histograms(axes[1, 1], image_gt_balanced_8bit, 'Ground truth')
+    
+    plt.tight_layout()
+    
+    i += 1
+    # Save the histogram
+    histogram_file_path = os.path.join(histogram_output_path, f"histogram_GT_{i}.png")
+    plt.savefig(histogram_file_path)
+    # Close the figure to avoid display
+    plt.close(fig)
