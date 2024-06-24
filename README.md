@@ -1,1 +1,1 @@
-# Balanceamento-de-Cores
+# Balanco-de-Cores
